@@ -165,18 +165,11 @@ impl Plugin for PumpkinPregen {
                     state: Arc::clone(&self.state),
                 })
                 .then(
-                    CommandNode::argument(
-                        "center_x",
-                        &ArgumentType::Integer((None, None)),
-                    )
-                    .then(
-                        CommandNode::argument(
-                            "center_z",
-                            &ArgumentType::Integer((None, None)),
-                        )
-                        .execute(StartCommand {
-                            state: Arc::clone(&self.state),
-                        }),
+                    CommandNode::argument("center_x", &ArgumentType::Integer((None, None))).then(
+                        CommandNode::argument("center_z", &ArgumentType::Integer((None, None)))
+                            .execute(StartCommand {
+                                state: Arc::clone(&self.state),
+                            }),
                     ),
                 ),
             ),
