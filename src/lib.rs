@@ -13,7 +13,7 @@ use pumpkin_plugin_api::{
 };
 use tracing::{info, warn};
 
-const PERMISSION: &str = "pumpkinpregen:command.pregen";
+const PERMISSION: &str = "PumpkinPregen:command.pregen";
 const BATCH_SIDE: i32 = 8;
 const BATCH_POLL_TIMEOUT_TICKS: u32 = 20 * 120;
 const SAVE_EVERY_CHUNKS: u64 = 1024;
