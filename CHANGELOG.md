@@ -2,6 +2,8 @@
 
 ## 0.1.0
 
+- Fixed the permission namespace casing required by Pumpkin (`PumpkinPregen:command.pregen`).
+
 - Initial native Pumpkin WASM plugin.
 - Added square pregeneration around the player's current position.
 - Added bounded 8 x 8 chunk force-load batches.
