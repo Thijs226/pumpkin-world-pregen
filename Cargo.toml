@@ -1,0 +1,25 @@
+[package]
+name = "pumpkin-pregen"
+version = "0.1.0"
+edition = "2024"
+authors = ["Thijs226"]
+description = "Native Pumpkin world pregenerator for terrain analysis and pre-generating chunks"
+license = "MIT"
+repository = "https://github.com/Thijs226/pumpkin-world-pregen"
+keywords = ["minecraft", "pumpkin", "pregen", "chunks"]
+categories = ["game-development"]
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+pumpkin-plugin-api = "=0.1.0-dev+26.2-26.45"
+tracing = "0.1"
+
+[profile.release]
+lto = true
+opt-level = "s"
+strip = true
+codegen-units = 1
+panic = "abort"
