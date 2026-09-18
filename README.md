@@ -27,7 +27,7 @@ This means the actual loading and generation still goes through Pumpkin's normal
 The command permission is:
 
 ```text
-pumpkinpregen:command.pregen
+PumpkinPregen:command.pregen
 ```
 
 It defaults to permission level 3 operators.
