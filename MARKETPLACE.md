@@ -13,6 +13,7 @@ It is not required for normal server performance. I originally made it because I
 Commands:
 
 - `/pregen start <radius-blocks>`
+- `/pregen trim <radius-blocks>` (guarded on current Pumpkin builds because persisted chunk deletion is not exposed to WASM plugins yet)
 - `/pregen status`
 - `/pregen cancel`
 
