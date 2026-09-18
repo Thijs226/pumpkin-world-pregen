@@ -2,6 +2,7 @@
 
 ## 0.1.0
 
+- Added a guarded `/pregen trim <radius-blocks>` command. Current Pumpkin WASM APIs do not expose persisted chunk deletion yet, so the command reports the intended keep area without modifying chunks.
 - Fixed the permission namespace casing required by Pumpkin (`PumpkinPregen:command.pregen`).
 
 - Initial native Pumpkin WASM plugin.
