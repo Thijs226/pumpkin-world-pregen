@@ -1,13 +1,12 @@
 use std::sync::{Arc, Mutex};
 
 use pumpkin_plugin_api::{
-    Context, Plugin, PluginMetadata, Server, register_plugin,
-    command::{
-        Arg, ArgumentType, Command, CommandError, CommandNode, CommandSender, ConsumedArgs,
-    },
+    Context, Plugin, PluginMetadata, Server,
+    command::{Arg, ArgumentType, Command, CommandError, CommandNode, CommandSender, ConsumedArgs},
     command_wit::Number,
     commands::CommandHandler,
     permission::{Permission, PermissionDefault, PermissionLevel},
+    register_plugin,
     scheduler::{SchedulerExt, cancel_task},
     server::CommandSender as ServerCommandSender,
     text::TextComponent,
@@ -227,7 +226,10 @@ impl CommandHandler for StartCommand {
         };
 
         let Some((x, _, z)) = sender.position() else {
-            send_error(&sender, "Run /pregen start in-game so a center position is available.");
+            send_error(
+                &sender,
+                "Run /pregen start in-game so a center position is available.",
+            );
             return Ok(0);
         };
         let Some(world) = sender.world() else {
@@ -598,7 +600,12 @@ fn tick_job(server: &Server, shared: &SharedState) {
                     if should_save {
                         job.last_saved_chunks = job.completed_chunks;
                     }
-                    Some((forceloads, should_save, job.completed_chunks, job.total_chunks))
+                    Some((
+                        forceloads,
+                        should_save,
+                        job.completed_chunks,
+                        job.total_chunks,
+                    ))
                 }
             }) else {
                 return;
@@ -606,9 +613,7 @@ fn tick_job(server: &Server, shared: &SharedState) {
 
             remove_forceloads(server, &dimension, &forceloads);
 
-            if should_save
-                && let Err(error) = world.save()
-            {
+            if should_save && let Err(error) = world.save() {
                 warn!("Periodic world save failed during pregeneration: {error}");
             }
 
@@ -849,15 +854,13 @@ fn remove_forceloads(server: &Server, dimension: &str, runs: &[Batch]) {
 
 fn add_forceload(server: &Server, dimension: &str, batch: Batch) {
     let (x1, z1, x2, z2) = batch.forceload_coordinates();
-    let command =
-        format!("execute in {dimension} run forceload add {x1} {z1} {x2} {z2}");
+    let command = format!("execute in {dimension} run forceload add {x1} {z1} {x2} {z2}");
     server.execute_command(&command, ServerCommandSender::Console);
 }
 
 fn remove_forceload(server: &Server, dimension: &str, batch: Batch) {
     let (x1, z1, x2, z2) = batch.forceload_coordinates();
-    let command =
-        format!("execute in {dimension} run forceload remove {x1} {z1} {x2} {z2}");
+    let command = format!("execute in {dimension} run forceload remove {x1} {z1} {x2} {z2}");
     server.execute_command(&command, ServerCommandSender::Console);
 }
 
