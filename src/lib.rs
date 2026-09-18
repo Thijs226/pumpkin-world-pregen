@@ -14,7 +14,7 @@ use pumpkin_plugin_api::{
 use tracing::{info, warn};
 
 const PERMISSION: &str = "PumpkinPregen:command.pregen";
-const BATCH_SIDE: i32 = 8;
+const BATCH_SIDE: i32 = 1;
 const BATCH_POLL_TIMEOUT_TICKS: u32 = 20 * 120;
 const SAVE_EVERY_CHUNKS: u64 = 1024;
 const MIN_RADIUS: i32 = 0;
@@ -163,7 +163,22 @@ impl Plugin for PumpkinPregen {
                 )
                 .execute(StartCommand {
                     state: Arc::clone(&self.state),
-                }),
+                })
+                .then(
+                    CommandNode::argument(
+                        "center_x",
+                        &ArgumentType::Integer((None, None)),
+                    )
+                    .then(
+                        CommandNode::argument(
+                            "center_z",
+                            &ArgumentType::Integer((None, None)),
+                        )
+                        .execute(StartCommand {
+                            state: Arc::clone(&self.state),
+                        }),
+                    ),
+                ),
             ),
         )
         .execute(HelpCommand);
@@ -211,7 +226,7 @@ impl CommandHandler for HelpCommand {
         _args: ConsumedArgs,
     ) -> Result<i32, CommandError> {
         send(&sender, "PumpkinPregen commands:");
-        send(&sender, "/pregen start <radius-blocks>");
+        send(&sender, "/pregen start <radius-blocks> [center-x center-z]");
         send(&sender, "/pregen trim <radius-blocks>");
         send(&sender, "/pregen status");
         send(&sender, "/pregen cancel");
@@ -283,16 +298,21 @@ impl CommandHandler for StartCommand {
             return Ok(0);
         };
 
-        let Some((x, _, z)) = sender.position() else {
-            send_error(
-                &sender,
-                "Run /pregen start in-game so a center position is available.",
-            );
-            return Ok(0);
-        };
-        let Some(world) = sender.world() else {
-            send_error(&sender, "Could not determine your current world.");
-            return Ok(0);
+        let center_x = read_i32(&args, "center_x").unwrap_or(0);
+        let center_z = read_i32(&args, "center_z").unwrap_or(0);
+
+        let world = if let Some(world) = sender.world() {
+            world
+        } else {
+            let Some(world) = server
+                .get_all_worlds()
+                .into_iter()
+                .find(|candidate| candidate.get_dimension() == "minecraft:overworld")
+            else {
+                send_error(&sender, "Could not find the primary Overworld.");
+                return Ok(0);
+            };
+            world
         };
 
         let world_name = world.get_name();
@@ -333,8 +353,6 @@ impl CommandHandler for StartCommand {
             return Ok(0);
         }
 
-        let center_x = floor_to_i32(x);
-        let center_z = floor_to_i32(z);
         let min_block_x = center_x.saturating_sub(radius);
         let max_block_x = center_x.saturating_add(radius);
         let min_block_z = center_z.saturating_sub(radius);
@@ -387,8 +405,12 @@ impl CommandHandler for StartCommand {
         send(
             &sender,
             &format!(
-                "Started pregenerating {} chunks in {} using {}x{} chunk batches.",
-                total_chunks, world_name, BATCH_SIDE, BATCH_SIDE
+                "Started pregenerating {} chunks in {} around {}, {} using {} chunk per step.",
+                total_chunks,
+                world_name,
+                center_x,
+                center_z,
+                BATCH_SIDE * BATCH_SIDE
             ),
         );
         send(
