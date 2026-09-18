@@ -2,6 +2,8 @@
 
 ## 0.1.0
 
+- Changed pregeneration to one chunk per scheduler step to avoid freezing Pumpkin with large synchronous force-load batches.
+- Added console-friendly centers: `/pregen start <radius>` defaults to `0 0`, while `/pregen start <radius> <x> <z>` uses an explicit center.
 - Added a guarded `/pregen trim <radius-blocks>` command. Current Pumpkin WASM APIs do not expose persisted chunk deletion yet, so the command reports the intended keep area without modifying chunks.
 - Fixed the permission namespace casing required by Pumpkin (`PumpkinPregen:command.pregen`).
 
