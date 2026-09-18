@@ -18,6 +18,7 @@ This means the actual loading and generation still goes through Pumpkin's normal
 
 ```text
 /pregen start <radius-blocks>
+/pregen trim <radius-blocks>
 /pregen status
 /pregen cancel
 ```
@@ -43,6 +44,12 @@ It defaults to permission level 3 operators.
 - `/pregen cancel` cleans up the active batch before stopping.
 - Normal plugin unload also removes the active force-load batch.
 - A batch that is stuck for 120 seconds is cleaned up and the job stops instead of hanging forever.
+
+### Trim command
+
+`/pregen trim <radius-blocks>` is registered now, but on current Pumpkin builds it is intentionally guarded and performs no deletion. Pumpkin's WASM plugin API does not yet expose safe deletion of persisted chunks or region entries.
+
+The command reports the square area that would be kept and explicitly states that no chunks were modified. Once Pumpkin exposes a safe chunk-deletion API, this command can become a real Chunky-style trim without changing its syntax.
 
 ## Current limitation
 
