@@ -6,13 +6,13 @@ Native world pregenerator for Pumpkin. Useful for terrain-generation analysis, t
 
 ## Full description
 
-PumpkinPregen pregenerates world chunks on Pumpkin using bounded batches so large areas can be generated without requesting everything at once.
+PumpkinPregen pregenerates world chunks on Pumpkin using a throttled one-chunk-at-a-time scheduler so large areas can be generated without firing a large synchronous load spike at the server.
 
 It is not required for normal server performance. I originally made it because I needed a repeatable way to pregenerate larger areas while analysing Pumpkin's terrain generation, then decided to publish it in case other server owners or Pumpkin developers find it useful.
 
 Commands:
 
-- `/pregen start <radius-blocks>`
+- `/pregen start <radius-blocks> [center-x center-z]`
 - `/pregen trim <radius-blocks>` (guarded on current Pumpkin builds because persisted chunk deletion is not exposed to WASM plugins yet)
 - `/pregen status`
 - `/pregen cancel`
