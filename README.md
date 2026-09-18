@@ -17,13 +17,13 @@ This means the actual loading and generation still goes through Pumpkin's normal
 ## Commands
 
 ```text
-/pregen start <radius-blocks>
+/pregen start <radius-blocks> [center-x center-z]
 /pregen trim <radius-blocks>
 /pregen status
 /pregen cancel
 ```
 
-`radius-blocks` is measured outward from the player's current X/Z position. The generated area is square, similar to a square Chunky selection. A radius of `0` is useful as a one-chunk smoke test.
+`radius-blocks` defines a square radius in blocks. If no center is supplied, the center defaults to `0 0`. You can provide an explicit center, for example `/pregen start 1000 100 250`. Console starts use the primary Overworld. A radius of `0` is useful as a one-chunk smoke test.
 
 The command permission is:
 
@@ -35,10 +35,10 @@ It defaults to permission level 3 operators.
 
 ## Safety and load control
 
-- Generates at most an 8 x 8 chunk force-load batch at a time.
-- Waits for a batch to finish before requesting the next one.
+- Requests only one chunk per scheduler step to avoid large synchronous `/forceload` spikes on Pumpkin's main server thread.
+- Waits for that chunk to finish loading before requesting the next one.
 - Skips chunks that are already loaded, so it does not intentionally disturb existing force-loaded chunks.
-- If a player-loaded chunk unloads while its batch is still running, PumpkinPregen notices it and temporarily force-loads that chunk so the job cannot stall.
+- If the active chunk unloads while its step is still running, PumpkinPregen notices it and temporarily force-loads it so the job cannot stall.
 - Tracks and removes only the force-load runs PumpkinPregen itself requested.
 - Saves every 1,024 completed chunks and once again at completion. Pumpkin also persists generated or dirty chunks when they unload.
 - `/pregen cancel` cleans up the active batch before stopping.
