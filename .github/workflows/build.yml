@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-wasip2
+          components: rustfmt
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Build release WASM
+        run: cargo build --release
+      - name: Upload WASM
+        uses: actions/upload-artifact@v7
+        with:
+          name: pumpkin-pregen-wasm
+          path: target/wasm32-wasip2/release/pumpkin_pregen.wasm
