@@ -147,6 +147,15 @@ impl Plugin for PumpkinPregen {
             state: Arc::clone(&self.state),
         }))
         .then(
+            CommandNode::literal("trim").then(
+                CommandNode::argument(
+                    "radius",
+                    &ArgumentType::Integer((Some(MIN_RADIUS), Some(MAX_RADIUS))),
+                )
+                .execute(TrimCommand),
+            ),
+        )
+        .then(
             CommandNode::literal("start").then(
                 CommandNode::argument(
                     "radius",
@@ -203,9 +212,58 @@ impl CommandHandler for HelpCommand {
     ) -> Result<i32, CommandError> {
         send(&sender, "PumpkinPregen commands:");
         send(&sender, "/pregen start <radius-blocks>");
+        send(&sender, "/pregen trim <radius-blocks>");
         send(&sender, "/pregen status");
         send(&sender, "/pregen cancel");
         Ok(1)
+    }
+}
+
+struct TrimCommand;
+
+impl CommandHandler for TrimCommand {
+    fn handle(
+        &self,
+        sender: CommandSender,
+        _server: Server,
+        args: ConsumedArgs,
+    ) -> Result<i32, CommandError> {
+        let Some(radius) = read_i32(&args, "radius") else {
+            send_error(&sender, "Invalid radius.");
+            return Ok(0);
+        };
+
+        let Some((x, _, z)) = sender.position() else {
+            send_error(
+                &sender,
+                "Run /pregen trim in-game so a center position is available.",
+            );
+            return Ok(0);
+        };
+        let Some(world) = sender.world() else {
+            send_error(&sender, "Could not determine your current world.");
+            return Ok(0);
+        };
+
+        let center_x = floor_to_i32(x);
+        let center_z = floor_to_i32(z);
+        let min_x = center_x.saturating_sub(radius);
+        let max_x = center_x.saturating_add(radius);
+        let min_z = center_z.saturating_sub(radius);
+        let max_z = center_z.saturating_add(radius);
+
+        send_error(
+            &sender,
+            &format!(
+                "Trim is unavailable on this Pumpkin build because the WASM plugin API cannot delete persisted chunks yet. Requested keep area in {}: X {}..{}, Z {}..{}. No chunks were modified.",
+                world.get_name(),
+                min_x,
+                max_x,
+                min_z,
+                max_z
+            ),
+        );
+        Ok(0)
     }
 }
 
